@@ -1,0 +1,48 @@
+# Build output
+Anura3D_OpenSource/src/VS/Debug/
+Anura3D_OpenSource/src/VS/Release/
+
+# Compiled binaries
+*.exe
+*.obj
+*.mod
+*.pdb
+*.ilk
+*.idb
+*.dll
+*.lib
+
+# Visual Studio / Intel Fortran temp files
+*.u2d
+*.suo
+*.user
+*.aps
+*.opensdf
+*.sdf
+*.opendb
+*.VC.db
+*.VC.opendb
+
+# Output files (simulation results)
+*.h5
+*.hdf5
+*.vtk
+*.vtu
+*.vtp
+*.csv
+*.log
+*.out
+*.txt.res
+*._gid
+
+# LFS pointer files (actual content not available locally)
+Anura3D_OpenSource/manuals/TutorialManual_2022.pdf
+Anura3D_OpenSource/manuals/TutorialManual_2023.pdf
+Anura3D_OpenSource/src/GiD_Problemtype/Anura3D_2023.gid/doc/LicenseAgreement_Version_1.2.pdf
+Anura3D_OpenSource/src/GiD_Problemtype/Anura3D_2023.gid/doc/TutorialManual_2022.pdf
+Anura3D_OpenSource/src/GiD_Problemtype/Anura3D_2023.gid/doc/TutorialManual_2023.pdf
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
