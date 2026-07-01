@@ -266,7 +266,6 @@
                  do I = 1, NVECTOR
                    DoSkipStressComputation = DoSkipStressComputation .and. CalParams%ApplyPrescribedVelocity(I)
                  end do
-    
 		  	     if (MatParams(IDMaterial)%MaterialModel==ESM_RIGID_BODY) then
 					DoSkipStressComputation = .true.
                  end if

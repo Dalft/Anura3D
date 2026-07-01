@@ -331,7 +331,9 @@
           end if
           
           if (CalParams%ApplyContactAlgorithm) then
-            call ReAssignEntityID()
+            if (.not. IsFollowUpPhase()) then
+              call ReAssignEntityID()
+            end if
           end if
         
         end subroutine ReinitialiseMaterialPoints

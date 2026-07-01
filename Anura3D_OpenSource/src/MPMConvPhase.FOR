@@ -773,6 +773,20 @@
                        end if
                    end if
             endif
+
+            ! --- Contact fix: rollback to center of old element if penetration detected
+            if (CalParams%ApplyContactAlgorithm .and. Success) then
+              if (GlobContElement(NewElementID) .and. (.not. GlobContElement(ElementID))) then
+                ! Soil particle penetrated into a rigid body element.
+                ! Rollback to geometric center of the old (soil) element.
+                LocPos = 0.0_REAL_TYPE
+                Particles(IParticle)%LocPos = LocPos
+                GlobPosArray(IParticle,:) = GPGlobalPositionElement(:, 1, ElementID)
+                NewElementID = ElementID
+              end if
+            end if
+            ! --- End contact penetration fix
+
             ! Update Particle%LocPos, Particle%ElementID and EleParticles array
             if (Success) then
               Particles(IParticle)%LocPos = LocPos
@@ -1729,8 +1743,7 @@
                endif
            end do
                
-        end subroutine 
-
+        end subroutine
 
       end module ModConvectivePhase
 
