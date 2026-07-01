@@ -114,24 +114,44 @@
 		<value n="mass_scaling_factor" pn="mass scaling factor [-]" v="1.0" state="hidden"/>
 		
 	  <value n="HOMOGENEOUS_LOCAL_DAMPING" pn="HOMOGENEOUS LOCAL DAMPING" icon="cps" values="do not apply homogeneous local damping,apply homogeneous local damping" v="do not apply homogeneous local damping" actualize_tree="1">
-        <dependencies node="../value[@n='local_damping_coefficient']" att1="state" v1="normal" value="apply homogeneous local damping"/>       
+        	<dependencies node="../value[@n='local_damping_coefficient']" att1="state" v1="normal" value="apply homogeneous local damping"/>       
 		<dependencies node="../value[@n='local_damping_coefficient']" att1="state" v1="hidden" value="do not apply homogeneous local damping"/>
 	  </value>
 		<value n="local_damping_coefficient" pn="local damping coefficient [-]" v="0.75" state="hidden"/>
+	  
+ 	  <value n="BOUNDARY_HG_CONTROL" pn="BOUNDARY HOURGLASS CONTROL" icon="cps" values="do not apply boundary hourglass control,apply boundary hourglass control" v="do not apply boundary hourglass control" actualize_tree="1">
+        	<dependencies node="../value[@n='reference_depth']" att1="state" v1="normal" value="apply boundary hourglass control"/>       
+		<dependencies node="../value[@n='reference_depth']" att1="state" v1="hidden" value="do not apply boundary hourglass control"/>
+		<dependencies node="../value[@n='distance_from_the_surface']" att1="state" v1="normal" value="apply boundary hourglass control"/>       
+		<dependencies node="../value[@n='distance_from_the_surface']" att1="state" v1="hidden" value="do not apply boundary hourglass control"/>
+	  </value>
+		<value n="reference_depth" pn="reference depth [-]" v="0.2" state="hidden"/>
+		<value n="distance_from_the_surface" pn="distance from the surface [-]" v="0.2" state="hidden"/>
 		
 	  <value n="BULK_VISCOSITY_DAMPING" pn="BULK VISCOSITY DAMPING" icon="cps" values="do not apply viscosity damping,apply viscosity damping" v="do not apply viscosity damping" actualize_tree="1">
-        <dependencies node="../value[@n='linear_coefficient']" att1="state" v1="normal" value="apply viscosity damping"/>       
+        	<dependencies node="../value[@n='linear_coefficient']" att1="state" v1="normal" value="apply viscosity damping"/>       
 		<dependencies node="../value[@n='linear_coefficient']" att1="state" v1="hidden" value="do not apply viscosity damping"/>
 		<dependencies node="../value[@n='quadratic_coefficient']" att1="state" v1="normal" value="apply viscosity damping"/>       
 		<dependencies node="../value[@n='quadratic_coefficient']" att1="state" v1="hidden" value="do not apply viscosity damping"/>
 	  </value>
 		<value n="linear_coefficient" pn="linear coefficient [-]" v="0.06" state="hidden"/>
 		<value n="quadratic_coefficient" pn="quadratic coefficient [-]" v="1.2" state="hidden"/>
+
+	  <value n="Hourglass_Control" pn="Hourglass_Control" icon="cps" values="do not apply hourglass control,apply hourglass control" v="do not apply hourglass control" actualize_tree="1">
+        	<dependencies node="../value[@n='Stiffness_control']" att1="state" v1="normal" value="apply hourglass control"/>       
+		<dependencies node="../value[@n='Stiffness_control']" att1="state" v1="hidden" value="do not apply hourglass control"/>
+		<dependencies node="../value[@n='Viscosity_control']" att1="state" v1="normal" value="apply hourglass control"/>       
+		<dependencies node="../value[@n='Viscosity_control']" att1="state" v1="hidden" value="do not apply hourglass control"/>
+	  </value>
+		<value n="Stiffness_control" pn="Stiffness_control [-]" v="0.01" state="hidden"/>
+		<value n="Viscosity_control" pn="Viscosity_control [-]" v="0.001" state="hidden"/>
 		
 	  <value n="STRAIN_SMOOTHING" pn="STRAIN SMOOTHING" icon="cps" values="do not apply strain smoothing,apply strain smoothing" v="do not apply strain smoothing"/>
       <value n="LIQUID_PRESSURE_INCREMENT_SMOOTHING" icon="cps" pn="LIQUID PRESSURE INCREMENT SMOOTHING" values="do not apply liquid pressure increment smoothing,apply liquid pressure increment smoothing" v="do not apply liquid pressure increment smoothing"/>
       <value n="FIX_SOLID_SKELETON" pn="FIX SOLID SKELETON" icon="cps" values="Solid Skeleton Free,Solid Skeleton Fixed" v="Solid Skeleton Free"/>
-      
+
+      <value n="B_BAR" pn="B_BAR(QUAD4)" icon="cps" values="do not apply B_BAR algorithm,apply B_BAR algorithm" v="do not apply B_BAR algorithm"/>
+
 	  <value n="CONTACT" pn="CONTACT" icon="cps" values="do not apply contact,apply contact" v="do not apply contact" actualize_tree="1">	    
         <dependencies node="../value[@n='node_normal_correction']" att1="state" v1="normal" value="apply contact"/>       
 		<dependencies node="../value[@n='node_normal_correction']" att1="state" v1="hidden" value="do not apply contact"/>

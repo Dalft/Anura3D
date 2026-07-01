@@ -78,6 +78,7 @@ proc Anura3D::WriteCalculationFile_CPS { filename } {
       set gload_type "linear"             
     } elseif {$gload == "apply gravity load - stepwise"} {
       set gload_type "step"}
+ 
     GiD_WriteCalculationFile puts [= "%s %s %s" $gload_type $gmult_init $gmult_fin]
 
     # SOLID TRACTION_A
@@ -248,6 +249,20 @@ proc Anura3D::WriteCalculationFile_CPS { filename } {
       set LocalDamp_ID "1"}
     GiD_WriteCalculationFile puts [= "%s %s" $LocalDamp_ID $LocalDamp_value]
 
+    # BOUNDARY HG CONTROL
+    GiD_WriteCalculationFile puts {$$BOUNDARY_HG_CONTROL}
+    set BOUNDARY_HG_path {string(//container[@n="Calculation_Data"]/value[@n="BOUNDARY_HG_CONTROL"]/@v)}
+    set BOUNDARY_HG [$root selectNodes $BOUNDARY_HG_path]
+    set depth_value_path {string(//container[@n="Calculation_Data"]/value[@n="reference_depth"]/@v)}
+    set depth [$root selectNodes $depth_value_path]
+    set distance_value_path {string(//container[@n="Calculation_Data"]/value[@n="distance_from_the_surface"]/@v)}
+    set distance [$root selectNodes $distance_value_path]
+    if {$BOUNDARY_HG == "do not apply boundary hourglass control"} {
+      set BOUNDARY_HG_ID "0"
+    } elseif {$BOUNDARY_HG == "apply boundary hourglass control"} {
+      set BOUNDARY_HG_ID "1"}
+    GiD_WriteCalculationFile puts [= "%s %s %s" $BOUNDARY_HG_ID $depth $distance]   
+
     # BULK VISCOSITY DAMPING
     GiD_WriteCalculationFile puts {$$BULK_VISCOSITY_DAMPING}
     set ViscDamp_path {string(//container[@n="Calculation_Data"]/value[@n="BULK_VISCOSITY_DAMPING"]/@v)}
@@ -261,6 +276,20 @@ proc Anura3D::WriteCalculationFile_CPS { filename } {
     } elseif {$ViscDamp == "apply viscosity damping"} {
       set ViscDamp_ID "1"}
     GiD_WriteCalculationFile puts [= "%s %s %s" $ViscDamp_ID $Linear $Quadratic]   
+
+    # $$Hourglass_Control
+    GiD_WriteCalculationFile puts {$$HOURGLASS_CONTROL}
+    set Hourglass_path {string(//container[@n="Calculation_Data"]/value[@n="Hourglass_Control"]/@v)}
+    set Hourglass [$root selectNodes $Hourglass_path]
+    set Stiffness_path {string(//container[@n="Calculation_Data"]/value[@n="Stiffness_control"]/@v)}
+    set Stiffness [$root selectNodes $Stiffness_path]
+    set Viscosity_path {string(//container[@n="Calculation_Data"]/value[@n="Viscosity_control"]/@v)}
+    set Viscosity [$root selectNodes $Viscosity_path]   
+    if {$Hourglass == "do not apply hourglass control"} {
+      set Hourglass_ID "0"
+    } elseif {$Hourglass == "apply hourglass control"} {
+      set Hourglass_ID "1"}
+    GiD_WriteCalculationFile puts [= "%s %s %s" $Hourglass_ID $Stiffness $Viscosity]   
     
     # STRAIN SMOOTHING
     GiD_WriteCalculationFile puts {$$STRAIN_SMOOTHING}
@@ -291,6 +320,16 @@ proc Anura3D::WriteCalculationFile_CPS { filename } {
     } elseif {$FixSolid == "Solid Skeleton Fixed"} {
       set FixSolid_ID "1"}
     GiD_WriteCalculationFile puts $FixSolid_ID
+
+   # B_BAR(QUAD4)
+    GiD_WriteCalculationFile puts {$$B_BAR(QUAD4)}
+    set B_BAR_path {string(//container[@n="Calculation_Data"]/value[@n="B_BAR"]/@v)}
+    set B_BAR [$root selectNodes $B_BAR_path]
+    if {$B_BAR == "do not apply B_BAR algorithm"} {
+      set B_BAR_ID "0"
+    } elseif {$B_BAR == "apply B_BAR algorithm"} {
+      set B_BAR_ID "1"}
+    GiD_WriteCalculationFile puts $B_BAR_ID
 
     # CONTACT FORMULATION
     GiD_WriteCalculationFile puts {$$CONTACT_FORMULATION}

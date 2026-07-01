@@ -9,7 +9,6 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
     set model_name [file tail $project_path]
     set exe_name [GiD_Info Project ProblemType]
     set root [$::gid_groups_conds::doc documentElement] ;# xml document to get some tree data
-    customlib::SetBaseRoot $root
     set current_xml_root $root
 
   GiD_WriteCalculationFile puts "### Anura3D_2023 ###"
@@ -21,7 +20,7 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	if {$dim_type == "2D:plane-strain"} {
 	  GiD_WriteCalculationFile puts "2D-plane_strain"
 	} elseif {$dim_type == "2D:Axissymmetric"} {
-	  GiD_WriteCalculationFile puts "2D-Axissymmetric"
+	  GiD_WriteCalculationFile puts "2D-axisymmetric"
 	} elseif {$dim_type == "3D"} {
 	  GiD_WriteCalculationFile puts "3D-cartesian"
 	} elseif {$dim_type == "3D:Axissymmetric"} {
@@ -36,7 +35,9 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	  GiD_WriteCalculationFile puts "triangular_3-noded"
 	} elseif { ($elem_type == "Tetrahedra") && ($num_nodes == "10") } {
 	  GiD_WriteCalculationFile puts "tetrahedral_old"
-	} else {error [= "INPUT ERROR: Element type not properly defined. Only the following element types are supported: triangular 3-noded, tetrahedral 10-noded."]}
+	} elseif { ($elem_type == "Quadrilateral") && ($num_nodes == "4") } {
+	  GiD_WriteCalculationFile puts "quadrilateral_4-noded"
+	} else {error [= "INPUT ERROR: Element type not properly defined. Only the following element types are supported: triangular 3-noded, quadrilateral 4-noded, tetrahedral 10-noded."]}
 
       # FORMULATION
       GiD_WriteCalculationFile puts {$$FORMULATION}
@@ -81,21 +82,24 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 
        # ELEMENT CONNECTIVITIES
 	GiD_WriteCalculationFile puts {$$STARTELEMCON}
-	  if {$dim_type == "2D:plane-strain"} {
-	    set ElementList [GiD_Info Mesh Elements Triangle -sublist]
+          set info_mesh [GiD_Mesh get element 1]
+      	  set elem_type [lindex $info_mesh  1]
+	  if {$elem_type == "Quadrilateral"} {
+          set ElementList [GiD_Info Mesh Elements Quadrilateral -sublist]
+	  for {set i 0} {$i < $num_elements } {incr i} {
+	    set xcoor [lindex $ElementList  $i 1]
+	    set ycoor [lindex $ElementList  $i 2]
+	    set zcoor [lindex $ElementList  $i 3]
+            set acoor [lindex $ElementList  $i 4]
+	    GiD_WriteCalculationFile puts [= "%s %s %s %s" $xcoor $ycoor $zcoor $acoor]}
+	  } elseif {$elem_type == "Triangle"} {
+            set ElementList [GiD_Info Mesh Elements Triangle -sublist]
 	  for {set i 0} {$i < $num_elements } {incr i} {
 	    set xcoor [lindex $ElementList  $i 1]
 	    set ycoor [lindex $ElementList  $i 2]
 	    set zcoor [lindex $ElementList  $i 3]
 	    GiD_WriteCalculationFile puts [= "%s %s %s" $xcoor $ycoor $zcoor]}
-	  } elseif {$dim_type == "2D:Axissymmetric"} {
-	    set ElementList [GiD_Info Mesh Elements Triangle -sublist]
-	  for {set i 0} {$i < $num_elements } {incr i} {
-	    set xcoor [lindex $ElementList  $i 1]
-	    set ycoor [lindex $ElementList  $i 2]
-	    set zcoor [lindex $ElementList  $i 3]
-	    GiD_WriteCalculationFile puts [= "%s %s %s" $xcoor $ycoor $zcoor]}
-	  } elseif {$dim_type == "3D"} {
+	 } elseif {$dim_type == "3D"} {
 	    set ElementList [GiD_Info Mesh Elements Tetrahedra -sublist]
 	  for {set i 0} {$i < $num_elements } {incr i} {
 	    set xcoor [lindex $ElementList  $i 1]
@@ -968,7 +972,7 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	
 	# Reaction forces 2D/3D  (2D/3D)
 	# 2D On line
-	if {$dim_type == "2D:plane-strain"} {
+	if {$dim_type == "2D:plane-strain" || $dim_type == "2D:Axissymmetric" } {
 	set ov_type "line"
 	set xp [format_xpath {condition[@n="Reaction_forces"]/group[@ov=%s]} $ov_type]
 	set formats ""
@@ -2625,7 +2629,7 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	 if {$typemodel == "Rigid body"} {
 	    set node [$gNode selectNodes [format_xpath {container[@n="_material_constitutive_model"]/value[@n="x-constr"]}]]
 		set type [$node getAttribute "v"]
-	 if {$type == "yes"} {
+	 if {$type == "Yes"} {
 		        set flag 1
 	 } else {
 		        set flag 0
@@ -2634,7 +2638,7 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 		                                GiD_WriteCalculationFile puts $flag        
 	    set node [$gNode selectNodes [format_xpath {container[@n="_material_constitutive_model"]/value[@n="y-constr"]}]]
 		set type [$node getAttribute "v"]
-	 if {$type == "yes"} {
+	 if {$type == "Yes"} {
 		        set flag 1
 	 } else {
 		        set flag 0
@@ -3226,17 +3230,24 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	# Material ID (2D/3D)        
 	if {$dim_type == "2D:plane-strain" || $dim_type == "2D:Axissymmetric"} {
 	set ov_type "surface"
-	set ElementList [GiD_Info Mesh Elements Triangle -sublist]
-	set list_len [llength $ElementList]
+	set ElementList {}
+    	if {$elem_type == "Triangle"} {
+        set ElementList [GiD_Info Mesh Elements Triangle -sublist]
+    	} elseif {$elem_type == "Quadrilateral"} {
+        set ElementList [GiD_Info Mesh Elements Quadrilateral -sublist]
+        }
+	set list_len [llength $ElementList]	
 	set material_ID_list [lrepeat $list_len 0]
 	set damping_list [lrepeat $list_len 0.0]
 	set material_point_list_s [lrepeat $list_len 0]
+        set gaussian_point_list_s [lrepeat $list_len 1]
 	if {$layer_type == "Double_point"} {
 	set material_point_list_l [lrepeat $list_len 0]
 	set xp [format_xpath {container[@n="MPspecification"]/condition[@n="2D_Double-point"]/group} $ov_type]
 	} else {
 	set xp [format_xpath {container[@n="MPspecification"]/condition[@n="2D_Single-point"]/group} $ov_type]
-	}        
+        set xgp [format_xpath {container[@n="GPspecification"]/condition[@n="2D_Single-point"]/group} $ov_type]
+	}       
 	} elseif {$dim_type == "3D" || $dim_type == "3D:Axissymmetric"} {
 	set ov_type "volume"
 	set ElementList [GiD_Info Mesh Elements Tetrahedra -sublist]
@@ -3244,6 +3255,7 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 	set material_ID_list [lrepeat $list_len 0]
 	set damping_list [lrepeat $list_len 0.0]
 	set material_point_list_s [lrepeat $list_len 0]
+        set gaussian_point_list_s [lrepeat $list_len 1]
 	if {$layer_type == "Double_point"} {
 	set material_point_list_l [lrepeat $list_len 0]
 	set xp [format_xpath {container[@n="MPspecification"]/condition[@n="3D_Double-point"]/group} $ov_type]
@@ -3271,8 +3283,17 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 		        lset material_point_list_l [expr $node_id -1] $materialpoints_l
 		        }
 		        lset damping_list [expr $node_id -1] $mat_damp
+		}
 	}
-
+        foreach gNode [$root selectNodes $xgp] {
+		set list_group [$gNode @n]
+                set gaussianpoint_s  [$gNode selectNodes {string(value[@n="solid_GP_number"]/@v)}]
+	    	set elements_id [GiD_EntitiesGroups get $list_group elements]
+		set num_elems [objarray length $elements_id]
+	for {set i 0} {$i < $num_elems} {incr i} {
+ 			set node_id [objarray get $elements_id $i]
+              		lset gaussian_point_list_s [expr $node_id -1] $gaussianpoint_s
+                }
 	}
 	
 	GiD_WriteCalculationFile puts {$$STARTELMMAT}
@@ -3304,6 +3325,12 @@ proc Anura3D::WriteCalculationFile_GOM { filename } {
 		GiD_WriteCalculationFile puts [= "%s %s" $prints $printl]
 	}
 	
+	}
+	GiD_WriteCalculationFile puts {$$NUMBER_OF_GAUSSIAN_POINTS}
+	set len_gps_id [llength $gaussian_point_list_s]
+	for {set i 0} {$i < $len_gps_id} {incr i} {
+		set print [lindex $gaussian_point_list_s $i]
+		GiD_WriteCalculationFile puts $print 
 	}
 	GiD_WriteCalculationFile puts {$$FINISH}                                        
     GiD_WriteCalculationFile end

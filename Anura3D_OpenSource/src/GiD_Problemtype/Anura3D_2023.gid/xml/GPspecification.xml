@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><!-- -*- coding: utf-8; mode: SGML -*- -->
+
+<container n="GPspecification" pn="Gaussian Point Specification" icon="icon_mps">
+<condition n="2D_Single-point" pn="2D Single-point_Gaussian_TRI" ov="surface" ovm="element" ov_element_types="triangle" icon="darkorange-shellfish-18" groups_icon="yelowish-group" help="Select your material and the surfaces related to it" state="[check_dim_points 2D:plane-strain 2D:Axissymmetric Single_point %W]">
+<value n="solid_GP_number" pn="Number of Gaussian points" values="0,1,4" v="1" help="Number of Gaussian points per element"/>
+</condition>
+<condition n="2D_Single-point" pn="2D Single-point_Gaussian_QUAD" ov="surface" ovm="element" ov_element_types="quadrilateral" icon="darkorange-shellfish-18" groups_icon="yelowish-group" help="Select your material and the surfaces related to it" state="[check_dim_points 2D:plane-strain 2D:Axissymmetric Single_point %W]">
+<value n="solid_GP_number" pn="Number of Gaussian points" values="0,1,4" v="1" help="Number of Gaussian points per element"/>
+</condition>
+</container>
